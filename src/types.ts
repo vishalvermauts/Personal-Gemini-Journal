@@ -1,9 +1,30 @@
 export type ReflectionMode = 'reflection' | 'summary' | 'brainstorm';
 
+export type AIStatus = 'pending' | 'analyzing' | 'completed' | 'failed';
+
+export type AppTab = 'journal' | 'timeline' | 'insights' | 'memories' | 'privacy';
+
 export interface Turn {
   user: string;
   model: string;
   timestamp: string;
+}
+
+export interface LocationData {
+  name: string;
+  lat?: number;
+  lng?: number;
+  placeId?: string;
+  capturedAt: string;
+}
+
+export interface StructuredInsights {
+  title: string;
+  summary: string;
+  topics: string[];
+  keyIdeas: string[];
+  actionItems: string[];
+  mood?: string;
 }
 
 export interface Interaction {
@@ -14,6 +35,9 @@ export interface Interaction {
   prompt: string;
   response: string;
   turns: Turn[];
+  insights?: StructuredInsights;
+  location?: LocationData;
+  aiStatus: AIStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,4 +66,21 @@ export interface FirestoreErrorInfo {
       email?: string | null;
     }[];
   };
+}
+
+export interface ExportDataPayload {
+  exportDate: string;
+  appName: string;
+  entryCount: number;
+  entries: Array<{
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    mode: string;
+    prompt: string;
+    response: string;
+    insights?: StructuredInsights;
+    location?: LocationData;
+    turnsCount: number;
+  }>;
 }

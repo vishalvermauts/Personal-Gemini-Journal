@@ -1,6 +1,16 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Database, BrainCircuit, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
+import {
+  Shield,
+  Database,
+  BrainCircuit,
+  CheckCircle2,
+  Lock,
+  ArrowRight,
+  Clock,
+  MapPin,
+  Sparkles,
+} from 'lucide-react';
 
 export const LandingView: React.FC = () => {
   const { signInWithGoogle, loading, error } = useAuth();
@@ -10,17 +20,17 @@ export const LandingView: React.FC = () => {
       {/* Hero Section */}
       <div className="text-center max-w-3xl mx-auto space-y-6">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-gray-700 text-xs font-semibold uppercase tracking-wider">
-          <div className="w-2 h-2 rounded-full bg-black"></div>
-          Gemini 3.6 Flash & Cloud Firestore Architecture
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          Gemini LifeLog • Private AI Memory & Reflection
         </div>
 
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 leading-tight">
-          Private, AI-Powered Journaling & Deep Reflections
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+          Your Private AI Memory & Structured Reflection Vault
         </h1>
 
         <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-          Capture your thoughts, explore multi-turn reflections, and receive intelligent summaries.
-          Every entry is locked securely inside your own user-isolated Firestore vault.
+          Capture thoughts with guaranteed save-before-analysis resilience. Receive empathetic reflections,
+          structured insights, and actionable steps. Explore your chronological timeline, memory map, and growth trends.
         </p>
 
         {/* Primary CTA */}
@@ -49,7 +59,7 @@ export const LandingView: React.FC = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>{loading ? 'Authenticating...' : 'Sign in with Google to Begin'}</span>
+            <span>{loading ? 'Authenticating...' : 'Sign in with Google to Enter Vault'}</span>
             <ArrowRight className="h-4 w-4 text-white" />
           </button>
         </div>
@@ -67,71 +77,85 @@ export const LandingView: React.FC = () => {
 
       {/* Feature Pillars */}
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div id="feature-card-isolation" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
-          <div className="h-10 w-10 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
-            <Shield className="h-5 w-5" />
-          </div>
-          <h3 className="font-semibold text-base text-gray-900">User Data Isolation</h3>
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Rigorous security rules bind database operations to <code className="text-xs bg-gray-100 px-1 py-0.5 rounded text-gray-800">request.auth.uid</code>. Cross-user leaks are mathematically blocked.
-          </p>
-          <div className="pt-2 flex items-center gap-1.5 text-xs text-gray-800 font-medium">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Zero insecure database rules
-          </div>
-        </div>
-
-        <div id="feature-card-multiturn" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
-          <div className="h-10 w-10 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
-            <BrainCircuit className="h-5 w-5" />
-          </div>
-          <h3 className="font-semibold text-base text-gray-900">Multi-Turn Reflections</h3>
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Converse naturally with Gemini 3.6 Flash. Deepen your insights across multiple dialogue turns, request summaries, or brainstorm actionable next steps.
-          </p>
-          <div className="pt-2 flex items-center gap-1.5 text-xs text-gray-800 font-medium">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Resilient 4-step fallback ladder
-          </div>
-        </div>
-
-        <div id="feature-card-persistence" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
+        <div id="feature-card-resilience" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
           <div className="h-10 w-10 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
             <Database className="h-5 w-5" />
           </div>
-          <h3 className="font-semibold text-base text-gray-900">Cloud Firestore Vault</h3>
+          <h3 className="font-semibold text-base text-gray-900">Save-Before-Analysis</h3>
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-            Every thought and AI response is safely synced with zero data loss. Review your past history anytime, search entries, and track your personal journey.
+            Your words are saved to your vault before AI analysis begins. If connection or AI fails, your thoughts are
+            never lost and remain retryable.
           </p>
           <div className="pt-2 flex items-center gap-1.5 text-xs text-gray-800 font-medium">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Real-time listener synchronization
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Zero data loss guarantee
+          </div>
+        </div>
+
+        <div id="feature-card-insights" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
+          <div className="h-10 w-10 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
+            <Sparkles className="h-5 w-5 text-amber-500" />
+          </div>
+          <h3 className="font-semibold text-base text-gray-900">Structured AI Insights</h3>
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+            Automatic extraction of titles, summaries, topic tags, key ideas, and action items. Distinguishes your
+            original text from companion thoughts.
+          </p>
+          <div className="pt-2 flex items-center gap-1.5 text-xs text-gray-800 font-medium">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Schema-constrained JSON
+          </div>
+        </div>
+
+        <div id="feature-card-maps" className="p-6 bg-white rounded-xl border border-gray-200 shadow-xs space-y-3">
+          <div className="h-10 w-10 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
+            <MapPin className="h-5 w-5 text-rose-500" />
+          </div>
+          <h3 className="font-semibold text-base text-gray-900">Memory Map & Timeline</h3>
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+            Optionally attach places to memories. Relive moments on an interactive memory map and search your
+            chronological timeline anytime.
+          </p>
+          <div className="pt-2 flex items-center gap-1.5 text-xs text-gray-800 font-medium">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> 100% Opt-in location privacy
           </div>
         </div>
       </div>
 
       {/* Security Architecture Box */}
-      <div className="mt-12 p-6 bg-black text-white rounded-xl border border-gray-800 space-y-4 shadow-xs">
+      <div className="mt-12 p-6 bg-black text-white rounded-2xl border border-gray-800 space-y-4 shadow-xs">
         <div className="flex items-center gap-2">
           <Lock className="h-5 w-5 text-white" />
-          <h4 className="font-semibold text-white text-base">Security & Architectural Guarantees</h4>
+          <h4 className="font-semibold text-white text-base">Production Directives & Security Guarantees</h4>
         </div>
         <p className="text-xs sm:text-sm text-gray-300">
-          This system adheres to the 5 Threat Zones modeling framework:
+          Built according to the 5 Threat Zones defense framework:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-300">
           <div className="flex items-start gap-2">
-            <span className="text-white font-bold">•</span>
-            <span><strong>Zero Password Exposure:</strong> Federated Google OAuth via Firebase Auth handles credentials securely.</span>
+            <span className="text-emerald-400 font-bold">•</span>
+            <span>
+              <strong>Server-Side ID Token Auth:</strong> All protected API routes verify Firebase ID tokens via
+              Firebase Admin SDK.
+            </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-white font-bold">•</span>
-            <span><strong>Secret Hygiene:</strong> Gemini API keys are never exposed in browser bundles, proxying only through secure backend routes.</span>
+            <span className="text-emerald-400 font-bold">•</span>
+            <span>
+              <strong>Firestore Vault Isolation:</strong> Strict path-bound rules (<code>request.auth.uid == userId</code>)
+              mathematically prevent cross-user leaks.
+            </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-white font-bold">•</span>
-            <span><strong>Payload Sanitization:</strong> Strict zero-undefined stripping guarantees clean Firestore write transactions.</span>
+            <span className="text-emerald-400 font-bold">•</span>
+            <span>
+              <strong>Zero-Password Exposure:</strong> Federated Google Identity eliminates credential handling on custom
+              servers.
+            </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-white font-bold">•</span>
-            <span><strong>Prompt Injection Hardened:</strong> User reflections are strictly isolated from execution sinks and system meta-prompts.</span>
+            <span className="text-emerald-400 font-bold">•</span>
+            <span>
+              <strong>Prompt Injection Hardening:</strong> Journal content is encapsulated within untrusted data delimiters.
+            </span>
           </div>
         </div>
       </div>
