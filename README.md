@@ -334,7 +334,7 @@ npm run test:rules
 
 ## 12. Security Notes
 
-- **Zero Secret Exposure**: No credentials or private keys are stored in source code or Git history.
+- **Credentials & API Keys**: No server-side secrets, service-account private keys, or Gemini credentials are stored in the repository. Firebase Web configuration represents public client identifiers secured by Firebase Authentication and Firestore Security Rules. Google Maps uses a browser-restricted API key supplied strictly at build time.
 - **Runtime Least Privilege**: Cloud Run runs under a dedicated service account (`lifelog-runner`) granted only secret access to `GEMINI_API_KEY` and write access to Cloud Logging.
 - **No Service Account Keys**: Authenticates with Firebase Admin and Google Cloud APIs via Application Default Credentials (ADC).
 - **Prompt Injection Defense**: Untrusted user inputs are isolated within XML-like boundaries.

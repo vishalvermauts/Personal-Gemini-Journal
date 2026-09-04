@@ -7,7 +7,6 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/reflection-journal-with-gemini-ai:latest'
       - '.'
+
 images:
   - 'gcr.io/$PROJECT_ID/reflection-journal-with-gemini-ai:latest'
-substitutions:
-  _VITE_GOOGLE_MAPS_API_KEY: ''
