@@ -219,13 +219,25 @@ export const ReflectionWorkspace: React.FC<ReflectionWorkspaceProps> = ({
     // STEP 2: Call Gemini API for reflection and structured insights
     setIsAnalyzing(true);
 
-    const historyPayload = currentRecord.turns?.slice(0, -1) || [];
-
     try {
       const idToken = await currentUser.getIdToken();
+      const isFollowUpTurn = Boolean(activeInteraction && !retryEntry);
+      const activeTurnIndex = isFollowUpTurn ? (currentRecord.turns?.length ? currentRecord.turns.length - 1 : 0) : -1;
 
-      // Parallelize reflection and insights analysis
-      const [reflectRes, analyzeRes] = await Promise.all([
+      // Construct history: if it's a follow-up turn, the initial prompt and response is turn 0, followed by completed previous turns
+      let historyPayload: { user: string; model: string }[] = [];
+      let promptForGemini = currentRecord.prompt;
+
+      if (isFollowUpTurn) {
+        historyPayload = [
+          { user: currentRecord.prompt, model: currentRecord.response },
+          ...(currentRecord.turns?.slice(0, activeTurnIndex).map(t => ({ user: t.user, model: t.model })) || []),
+        ];
+        promptForGemini = currentRecord.turns?.[activeTurnIndex]?.user || promptToSend;
+      }
+
+      // Parallelize reflection (and only re-analyze structured insights for top-level entries)
+      const fetchPromises: Promise<Response>[] = [
         fetch('/api/gemini/reflect', {
           method: 'POST',
           headers: {
@@ -233,22 +245,29 @@ export const ReflectionWorkspace: React.FC<ReflectionWorkspaceProps> = ({
             'Authorization': `Bearer ${idToken}`,
           },
           body: JSON.stringify({
-            prompt: currentRecord.prompt,
+            prompt: promptForGemini,
             mode: currentRecord.mode,
             history: historyPayload,
           }),
         }),
-        fetch('/api/gemini/analyze', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            prompt: currentRecord.prompt,
-          }),
-        }),
-      ]);
+      ];
+
+      if (!isFollowUpTurn) {
+        fetchPromises.push(
+          fetch('/api/gemini/analyze', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              prompt: currentRecord.prompt,
+            }),
+          })
+        );
+      }
+
+      const [reflectRes, analyzeRes] = await Promise.all(fetchPromises);
 
       if (!reflectRes.ok) {
         throw new Error('Gemini reflection service was unavailable.');
@@ -258,20 +277,38 @@ export const ReflectionWorkspace: React.FC<ReflectionWorkspaceProps> = ({
       const geminiText = reflectData.response;
 
       let structuredInsights = currentRecord.insights;
-      if (analyzeRes.ok) {
+      if (analyzeRes && analyzeRes.ok) {
         const analyzeData = await analyzeRes.json();
         structuredInsights = analyzeData.insights;
       }
 
       // STEP 3: Update Firestore with completed AI output
-      const finalizedInteraction: Interaction = {
-        ...currentRecord,
-        title: structuredInsights?.title || currentRecord.title,
-        response: geminiText,
-        insights: structuredInsights,
-        aiStatus: 'completed',
-        updatedAt: new Date().toISOString(),
-      };
+      let finalizedInteraction: Interaction;
+
+      if (isFollowUpTurn && currentRecord.turns) {
+        const updatedTurns = [...currentRecord.turns];
+        if (updatedTurns[activeTurnIndex]) {
+          updatedTurns[activeTurnIndex] = {
+            ...updatedTurns[activeTurnIndex],
+            model: geminiText,
+          };
+        }
+        finalizedInteraction = {
+          ...currentRecord,
+          turns: updatedTurns,
+          aiStatus: 'completed',
+          updatedAt: new Date().toISOString(),
+        };
+      } else {
+        finalizedInteraction = {
+          ...currentRecord,
+          title: structuredInsights?.title || currentRecord.title,
+          response: geminiText,
+          insights: structuredInsights,
+          aiStatus: 'completed',
+          updatedAt: new Date().toISOString(),
+        };
+      }
 
       await saveInteraction(currentUser.uid, finalizedInteraction);
       onInteractionSaved(finalizedInteraction);
