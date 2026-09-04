@@ -1,29 +1,39 @@
 # Gemini LifeLog — Private AI Memory & Reflection Assistant
 
-> **Google Cloud Run AI Challenge Submission**
-> *Private, user-isolated journaling, multi-turn AI reflections, structured insight extraction, chronological timeline search, and memory mapping powered by Google Gemini and Cloud Firestore.*
+[![Google Cloud Run](https://img.shields.io/badge/Google%20Cloud-Cloud%20Run-blue?logo=google-cloud&logoColor=white)](https://cloud.google.com/run)
+[![Gemini AI](https://img.shields.io/badge/Google-Gemini%203.6%20Flash-8E75B2?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
+[![Firebase](https://img.shields.io/badge/Database-Cloud%20Firestore-FFA000?logo=firebase&logoColor=white)](https://firebase.google.com/)
+[![Google Maps](https://img.shields.io/badge/Maps-Google%20Maps%20Platform-4285F4?logo=google-maps&logoColor=white)](https://developers.google.com/maps)
+[![License: MIT / Apache 2.0](https://img.shields.io/badge/License-MIT%20%2F%20Apache%202.0-green.svg)](LICENSE)
+
+> **Google Cloud Run AI Challenge Submission**  
+> *Private, user-isolated journaling, multi-turn AI reflections, structured insight extraction, chronological timeline search, and interactive memory mapping powered by Google Gemini, Google Cloud Run, and Cloud Firestore.*
 
 ---
 
-## 1. Project Overview & Pitch
+## 1. Project Overview & Live Demo
 
-**Gemini LifeLog** transforms daily journaling from a passive text document into an active, private self-growth companion. Built with a **zero-trust privacy-first architecture**, it ensures that personal reflections are mathematically isolated to the authenticated user's private vault in Cloud Firestore, while leveraging **Gemini 3.6 Flash** (with a 4-tier resilient fallback ladder) to synthesize structured insights, topic trends, action items, and geographical memory maps.
+**Gemini LifeLog** transforms personal journaling from an ephemeral scratchpad into an intelligent, private self-growth companion. Built from the ground up with a **zero-trust privacy-first architecture**, it ensures that personal entries, emotional reflections, and geographical memory locations are mathematically isolated to the authenticated user's private vault in Cloud Firestore.
+
+- **Live Production URL**: [https://reflection-journal-with-gemini-ai-bgnfyu4eqa-as.a.run.app](https://reflection-journal-with-gemini-ai-bgnfyu4eqa-as.a.run.app)
+- **Deployment Platform**: Google Cloud Run (Region: `asia-southeast1`)
+- **Challenge Verification Label**: `dev-tutorial=cloud-run-ai-challenge`
 
 ### Key Innovations:
-- **Save-Before-Analysis Resilience**: User words are written to Firestore *before* calling AI models. Network hiccups or Gemini timeouts never cause data loss.
-- **Server-Side Token Verification**: All backend AI routes authenticate Firebase ID tokens via the Firebase Admin SDK.
-- **Structured AI Insights**: Schema-constrained extraction of concise titles, summaries, topic tags, key ideas, and action items.
-- **Timeline Search**: Chronological search by keyword, tag, or mood.
-- **Memory Map Canvas**: Spatial memory canvas plotting 100% opt-in geotagged memories.
-- **Privacy & Security Center**: Client-side one-click JSON/Markdown data export and typed irreversible data purge governed by Cloud Firestore security rules.
+1. **Save-Before-Analysis Guarantee**: User entries are committed to Cloud Firestore *before* calling AI models. Network failures, rate limits, or Gemini timeouts never cause data loss.
+2. **Server-Side Token Authentication**: All backend AI routes strictly verify Firebase ID tokens via the Firebase Admin SDK (`requireAuth`).
+3. **Structured AI Insight Extraction**: Real-time extraction of schema-constrained metadata (titles, summaries, topic tags, key ideas, action items, mood).
+4. **Chronological Timeline Search**: Multi-field client-side search across title, prompt, response, topic tags, and mood categories.
+5. **Interactive Memory Map Canvas**: Private spatial visualization plotting 100% opt-in geotagged memories via Google Maps Platform.
+6. **Privacy & Security Center**: Complete client-side JSON and Markdown export alongside irreversible typed-confirmation (`DELETE`) data purges.
 
 ---
 
-## 2. Starter Codelab vs. Gemini LifeLog
+## 2. Beyond the Starter Codelab
 
 | Feature Area | Starter Codelab | Gemini LifeLog (Challenge Submission) |
 | :--- | :--- | :--- |
-| **Backend Authentication** | Unauthenticated `/api/*` endpoints vulnerable to quota draining | **Strict Firebase ID Token Verification** via Firebase Admin SDK (`requireAuth`) |
+| **Backend Security** | Unauthenticated `/api/*` endpoints vulnerable to quota draining | **Strict Firebase ID Token Verification** via Firebase Admin SDK (`requireAuth`) |
 | **Data Persistence** | User text only saved *after* Gemini responds | **Resilient Save-Before-Analysis**: User text saved first; AI analysis is separately retryable |
 | **AI Output Structure** | Free-form markdown chat response only | **Structured Metadata Engine**: Schema-constrained titles, summaries, tags, key ideas, action items, and mood |
 | **Journal Organization** | Simple sidebar list without filtering | **Dedicated Chronological Timeline** with multi-field search, topic filters, mode selectors, and sort order |
@@ -38,45 +48,55 @@
 ## 3. Technology Stack
 
 - **Frontend**: React 19, TypeScript, Vite 6, Tailwind CSS v4, Lucide Icons, Motion.
-- **Backend**: Node.js, Express 4, TypeScript, `tsx`, `esbuild`.
+- **Maps Integration**: `@vis.gl/react-google-maps` (Google Maps Platform Maps JavaScript API).
+- **Backend**: Node.js 20, Express 4, TypeScript, `tsx`, `esbuild`.
 - **AI Engine**: Google Gen AI SDK (`@google/genai`), primary model `gemini-3.6-flash`.
 - **Identity & Auth**: Firebase Authentication (Google Identity Provider).
-- **Database**: Google Cloud Firestore (per-user Firestore data isolation).
-- **Secrets Management**: Google Cloud Secret Manager.
+- **Database**: Google Cloud Firestore (path-based per-user document isolation).
+- **Secrets Management**: Google Cloud Secret Manager (`GEMINI_API_KEY`).
 - **Hosting & Runtime**: Google Cloud Run (Containerized SPA + Express proxy).
 - **Testing**: Vitest, Supertest, `@firebase/rules-unit-testing`, Firebase Local Emulator Suite.
 
 ---
 
-## 4. Architecture & Security Highlights
+## 4. Architecture Overview
 
 ```mermaid
 graph TD
-    User["User Browser (Desktop / Mobile)"]
-    FirebaseAuth["Firebase Authentication (Google Identity)"]
-    ViteReact["React 19 SPA (Vite + Tailwind CSS v4)"]
-    CloudRun["Express API Proxy (Google Cloud Run)"]
-    FirebaseAdmin["Firebase Admin SDK (ADC / Token Verification)"]
-    SecretManager["Google Cloud Secret Manager (GEMINI_API_KEY)"]
-    Gemini["Gemini API (3.6-Flash / 3.1-Flash-Lite / Fallback Ladder)"]
-    Firestore["Cloud Firestore (users/{uid}/interactions)"]
+    subgraph ClientBrowser ["User Browser (Zero-Trust Client)"]
+        ReactApp["React 19 SPA (Vite + Tailwind CSS v4)"]
+        GoogleMaps["Google Maps Platform (@vis.gl/react-google-maps)"]
+        FirebaseAuthClient["Firebase Auth Client (Google Sign-In)"]
+    end
 
-    User -->|Google OAuth| FirebaseAuth
-    FirebaseAuth -->|JWT ID Token| User
-    User -->|Interactive UI| ViteReact
-    ViteReact -->|Direct Client-Side Vault Access| Firestore
-    ViteReact -->|Bearer ID Token + Prompts| CloudRun
-    CloudRun -->|Verify Token| FirebaseAdmin
-    CloudRun -->|Fetch Secret at Startup| SecretManager
-    CloudRun -->|Delimited Prompts| Gemini
+    subgraph GoogleCloud ["Google Cloud Platform (ai-resume-builder-497820)"]
+        subgraph CloudRunService ["Cloud Run Service: reflection-journal-with-gemini-ai"]
+            ExpressServer["Express API Server (Node.js 20)"]
+            AuthMiddleware["Auth Middleware (Firebase Admin Token Verification)"]
+            GeminiService["Gemini Reflection & Synthesis Engine"]
+        end
+
+        SecretManager["Secret Manager: GEMINI_API_KEY:latest"]
+        CloudFirestore["Cloud Firestore (Path: users/{uid}/interactions)"]
+        GeminiAPI["Google Gemini API (3.6-Flash / Fallback Ladder)"]
+    end
+
+    FirebaseAuthClient -->|Google OAuth 2.0| FirebaseAuthClient
+    FirebaseAuthClient -->|Firebase ID Token| ReactApp
+    ReactApp -->|Direct Authenticated Read/Write| CloudFirestore
+    ReactApp -->|Bearer ID Token + Prompts| ExpressServer
+    ExpressServer --> AuthMiddleware
+    AuthMiddleware -->|Validate Token| ExpressServer
+    ExpressServer --> GeminiService
+    SecretManager -.->|Runtime Secret Reference| ExpressServer
+    GeminiService -->|Structured Delimited Prompts| GeminiAPI
+    ReactApp -->|Restricted Maps Browser Key| GoogleMaps
 ```
 
 ### Security Boundary Clarification:
-- **AI Endpoints (`/api/gemini/*`)**: Server-side proxy running on Cloud Run, verified via Firebase Admin SDK using short-lived Firebase ID tokens.
+- **AI Reflection Endpoints (`/api/gemini/*`)**: Server-side proxy running on Cloud Run, verified via Firebase Admin SDK using short-lived Firebase ID tokens.
 - **Data Export & Deletion**: Executed client-side via Firebase Client SDK directly against Cloud Firestore under authenticated user credentials. Cloud Firestore security rules strictly enforce per-user data isolation (`request.auth.uid == userId`), making cross-user export or deletion impossible.
 - **Cloud Run Access Model**: Cloud Run service is intentionally deployed with `--allow-unauthenticated` to serve public web frontend assets without Google Cloud IAM requirements. Application-level authorization is enforced by Firebase Authentication and server-side token checks on sensitive API routes.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md), and [docs/SECURITY.md](docs/SECURITY.md) for full architectural specifications.
 
 ---
 
@@ -120,34 +140,20 @@ service cloud.firestore {
 }
 ```
 
----
+### How the Rules Protect User Privacy:
+- **Path-Based Confinement**: All journal interactions reside under `/users/{userId}/interactions/{interactionId}`.
+- **Strict UID Matching**: Read, create, update, and delete actions are blocked unless `request.auth.uid == userId`.
+- **Payload Integrity**: Document creation requires `request.resource.data.userId == userId`, preventing identity spoofing.
+- **Zero Default Access**: All unspecified root collections are explicitly rejected with `allow read, write: if false;`.
 
-## 7. Automated Testing Suite
-
-The repository includes automated test suites covering backend authentication, payload validation, undefined-stripping, export security, Google Maps coordinate resilience, and Firestore security rules:
-
+### Deploying Firestore Rules:
 ```bash
-# Run unit, API, and Google Maps resilience test suites (30 tests)
-npm test
-
-# Run Firestore Security Rules authorization matrix against Firebase Emulator (3 tests)
-npm run test:rules
+firebase deploy --only firestore:rules
 ```
 
-### Test Coverage Highlights:
-- **Missing / Malformed Authorization**: Returns HTTP 401.
-- **Expired / Invalid Token**: Returns HTTP 401.
-- **Identity Spoofing Resistance**: Verifies client-supplied `userId` cannot hijack the authenticated UID.
-- **Prompt Validation**: Enforces maximum bounds (12,000 characters) and turn array schemas (HTTP 400).
-- **Privacy Verification**: Confirms `/api/health` exposes zero secrets, keys, or timestamps.
-- **Zero-Crash Undefined Stripping**: Confirms undefined values are safely scrubbed before database commits.
-- **Export Sanitization**: Confirms exported JSON and Markdown exclude all tokens and credentials.
-- **Google Maps Coordinate Validation**: Rejects `NaN`, `null`, `undefined`, and out-of-bounds latitude/longitude points; safely handles entries without location; validates formatting.
-- **Firestore Authorization Matrix**: Validates User A can read/write own documents, User B is denied read/write/delete access to User A's data, and unauthenticated requests are denied.
-
 ---
 
-## 8. Google Maps Platform Integration (Memory Map)
+## 7. Google Maps Platform Integration (Memory Map)
 
 Gemini LifeLog integrates **Google Maps Platform** via `@vis.gl/react-google-maps` to render private, opt-in geotagged memories on an interactive map.
 
@@ -167,92 +173,174 @@ Browser-side Maps JavaScript API keys are delivered to client browsers by design
    - Production: `https://<YOUR_CLOUD_RUN_SERVICE_URL>/*`
    - Development: `http://localhost:5173/*` and `http://localhost:3000/*`
 4. **API Restrictions**: Under *API restrictions*, select **Restrict key** and choose strictly **Maps JavaScript API**.
-5. **Configure Environment**: Set the restricted public key:
-   - For local development: add `VITE_GOOGLE_MAPS_API_KEY=AIzaSy...` in your `.env`.
-   - For production build: supply `VITE_GOOGLE_MAPS_API_KEY` at build time. Never deploy an unrestricted production key.
+5. **Supply at Build Time**: Set `VITE_GOOGLE_MAPS_API_KEY` during Vite build. Never deploy an unrestricted production key.
 
 ---
 
-## 9. Google Cloud Configuration & Secret Manager
+## 8. Credentials & Configuration Architecture
 
-### 9.1. Enable Required Cloud APIs
+The application cleanly separates server-side secrets from browser build-time configurations:
+
+| Credential | Scope | Transport / Storage | Protection Mechanism |
+| :--- | :--- | :--- | :--- |
+| **`GEMINI_API_KEY`** | Backend Runtime | Google Cloud Secret Manager (`valueFrom.secretKeyRef`) | Never sent to browser; never logged; mounted via Cloud Run Secret Manager reference |
+| **`VITE_GOOGLE_MAPS_API_KEY`** | Frontend Bundle | Vite build-time environment variable (`ARG` in Docker) | Restricted by Google Cloud Console: HTTP referrers + Maps JavaScript API only |
+| **Firebase Web Config** | Frontend Client | `firebase-applet-config.json` | Public client identifiers protected by Firebase Authentication and Firestore Security Rules |
+
+---
+
+## 9. End-to-End Deployment Guide
+
+### Prerequisites
+- [Google Cloud SDK (`gcloud`)](https://cloud.google.com/sdk/docs/install) authenticated.
+- [Firebase CLI (`firebase`)](https://firebase.google.com/docs/cli) installed.
+- Docker or Google Cloud Build.
+
+### Step 1: Enable Required Google Cloud APIs
 ```bash
-gcloud services enable run.googleapis.com secretmanager.googleapis.com firestore.googleapis.com
+gcloud services enable \
+  run.googleapis.com \
+  secretmanager.googleapis.com \
+  firestore.googleapis.com \
+  cloudbuild.googleapis.com \
+  maps-backend.googleapis.com \
+  --project="YOUR_PROJECT_ID"
 ```
 
-### 9.2. Store Gemini API Key in Secret Manager
+### Step 2: Configure Runtime Service Account & Secret Manager
 ```bash
-# Create and populate the secret
-gcloud secrets create GEMINI_API_KEY --replication-policy="automatic"
-echo -n "YOUR_GEMINI_API_KEY" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
+# 1. Create dedicated runtime service account
+gcloud iam service-accounts create lifelog-runner \
+  --description="Runtime identity for Gemini LifeLog Cloud Run service" \
+  --display-name="lifelog-runner" \
+  --project="YOUR_PROJECT_ID"
 
-# Grant Cloud Run runtime service account permission to read the secret
+# 2. Grant logging role
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:lifelog-runner@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/logging.logWriter"
+
+# 3. Create Gemini Secret in Secret Manager
+gcloud secrets create GEMINI_API_KEY \
+  --replication-policy="automatic" \
+  --project="YOUR_PROJECT_ID"
+
+# 4. Add secret version (replace with your actual Gemini API key)
+echo -n "YOUR_ACTUAL_GEMINI_KEY" | gcloud secrets versions add GEMINI_API_KEY \
+  --data-file=- \
+  --project="YOUR_PROJECT_ID"
+
+# 5. Grant Secret Accessor specifically to the runtime service account
 gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
-  --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
+  --member="serviceAccount:lifelog-runner@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor" \
+  --project="YOUR_PROJECT_ID"
 ```
 
----
+### Step 3: Deploy Firestore Security Rules
+```bash
+firebase use YOUR_PROJECT_ID
+firebase deploy --only firestore:rules
+```
 
-## 10. Google Cloud Run Deployment Flow
-
-Deploy the containerized service directly to Google Cloud Run:
+### Step 4: Build Container with Maps Configuration
+Use Google Cloud Build to compile the frontend with your restricted Google Maps Platform key:
 
 ```bash
-# Build and deploy service to Cloud Run with Secret Manager binding
-gcloud run deploy gemini-lifelog-app \
-  --source . \
-  --platform managed \
-  --region us-central1 \
+gcloud builds submit \
+  --config cloudbuild.yaml \
+  --substitutions _VITE_GOOGLE_MAPS_API_KEY="YOUR_RESTRICTED_MAPS_KEY" \
+  --project="YOUR_PROJECT_ID"
+```
+
+### Step 5: Deploy to Google Cloud Run
+Deploy the container with the mandatory Secret Manager reference and AI Challenge label:
+
+```bash
+gcloud run deploy reflection-journal-with-gemini-ai \
+  --image="gcr.io/YOUR_PROJECT_ID/reflection-journal-with-gemini-ai:latest" \
+  --region="asia-southeast1" \
+  --project="YOUR_PROJECT_ID" \
+  --platform="managed" \
   --allow-unauthenticated \
-  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest
+  --service-account="lifelog-runner@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --set-secrets="GEMINI_API_KEY=GEMINI_API_KEY:latest" \
+  --update-labels="dev-tutorial=cloud-run-ai-challenge"
 ```
 
-### 10.1. Mandatory Challenge Verification Label
-Apply the required campaign label to register the service for automated challenge verification:
-
-```bash
-gcloud run services update gemini-lifelog-app \
-  --update-labels=dev-tutorial=cloud-run-ai-challenge \
-  --region=us-central1
-```
+### Step 6: Add Authorized Domain to Firebase Authentication
+In the [Firebase Console](https://console.firebase.google.com/):
+1. Navigate to **Authentication -> Settings -> Authorized Domains**.
+2. Click **Add Domain** and enter your Cloud Run service hostname:
+   `reflection-journal-with-gemini-ai-bgnfyu4eqa-as.a.run.app`
 
 ---
 
-## 11. Local Development
+## 10. Local Development Setup
 
 ```bash
-# 1. Install dependencies
+# 1. Clone repository
+git clone https://github.com/vishalvermauts/Personal-Gemini-Journal.git
+cd Personal-Gemini-Journal
+
+# 2. Install dependencies
 npm install
 
-# 2. Configure local environment variables (.env)
+# 3. Configure local environment
 cp .env.example .env
-# Add your GEMINI_API_KEY to .env
+# Edit .env and supply GEMINI_API_KEY and VITE_GOOGLE_MAPS_API_KEY
 
-# 3. Start unified full-stack dev server (port 3000)
+# 4. Start local development server (port 3000)
 npm run dev
 
-# 4. Run TypeScript checks
+# 5. Run static analysis & type checks
 npm run lint
 
-# 5. Run test suites
+# 6. Run automated test suites
 npm test
 
-# 6. Build production bundle
+# 7. Run Firestore rules tests with local emulator
+npm run test:rules
+
+# 8. Build production bundle
 npm run build
 ```
 
 ---
 
-## 12. Challenge Evaluation Mapping
+## 11. Automated Testing Suite
 
-- **Authenticity**: Genuinely extends the starter codelab by introducing structured AI insights, a chronological timeline with multi-field search, an insights growth dashboard, a Google Maps Platform-backed Memory Map, and full privacy export/purge tools.
-- **Usability**: Google Sign-In, responsive mobile/desktop navigation tabs, accessible controls, loading skeletons, prompt starters, and copy/export tools.
-- **Stability**: Zero-crash undefined-stripping, save-before-analysis transaction guarantees, idempotent retry buttons, defensive coordinate validation, and 33 automated regression tests.
-- **Security**: Server-side Firebase ID token verification, owner-bound Firestore security rules, Google Cloud Secret Manager integration, prompt-injection untrusted delimiters, secure browser Maps API key restrictions, and 100% opt-in location privacy.
+The repository features comprehensive automated test coverage (33 passing tests):
+
+```bash
+# Run unit, route authorization, and Maps resilience test suites (30 tests)
+npm test
+
+# Run Firestore Security Rules authorization matrix against Firebase Emulator (3 tests)
+npm run test:rules
+```
+
+### Test Coverage Highlights:
+- **Backend Route Protection**: Verifies `/api/gemini/reflect`, `/api/gemini/analyze`, and `/api/gemini/synthesis` return `401 Unauthorized` on missing, malformed, or expired tokens.
+- **Identity Spoofing Resistance**: Verifies client-supplied `userId` cannot hijack the authenticated UID.
+- **Prompt Validation**: Enforces maximum bounds (12,000 characters) and turn array schemas (`400 Bad Request`).
+- **Privacy Verification**: Confirms `/api/health` exposes zero secrets, keys, or timestamps.
+- **Zero-Crash Undefined Stripping**: Confirms undefined values are safely scrubbed before database commits.
+- **Export Sanitization**: Confirms exported JSON and Markdown exclude all tokens and credentials.
+- **Google Maps Coordinate Validation**: Rejects `NaN`, `null`, `undefined`, and out-of-bounds latitude/longitude points; safely handles entries without location; validates formatting.
+- **Firestore Authorization Matrix**: Validates User A can read/write own documents, User B is denied read/write/delete access to User A's data, and unauthenticated requests are denied.
+
+---
+
+## 12. Security Notes
+
+- **Zero Secret Exposure**: No credentials or private keys are stored in source code or Git history.
+- **Runtime Least Privilege**: Cloud Run runs under a dedicated service account (`lifelog-runner`) granted only secret access to `GEMINI_API_KEY` and write access to Cloud Logging.
+- **No Service Account Keys**: Authenticates with Firebase Admin and Google Cloud APIs via Application Default Credentials (ADC).
+- **Prompt Injection Defense**: Untrusted user inputs are isolated within XML-like boundaries.
 
 ---
 
 ## 13. License
 
-Apache 2.0 / MIT
+This project is licensed under the Apache 2.0 / MIT License.

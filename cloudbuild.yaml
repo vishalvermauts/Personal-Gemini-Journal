@@ -10,4 +10,4 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/reflection-journal-with-gemini-ai:latest'
 substitutions:
-  _VITE_GOOGLE_MAPS_API_KEY: 'AIzaSyDIQ7PTv2f6AV9gG0iB1vdP3BV2dqpmqgE'
+  _VITE_GOOGLE_MAPS_API_KEY: ''

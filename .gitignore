@@ -1,8 +1,25 @@
+# Dependencies
 node_modules/
+
+# Production builds
 build/
 dist/
+
+# Test coverage & reports
 coverage/
+.firebase/
+
+# OS & Editor
 .DS_Store
+Thumbs.db
 *.log
+
+# Sensitive credentials & service account keys
+*.json.key
+*credentials*.json
+*service-account*.json
+*serviceAccount*.json
+
+# Local environment files (preserve example template)
 .env*
 !.env.example
