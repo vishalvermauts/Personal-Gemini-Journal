@@ -23,3 +23,6 @@ Thumbs.db
 # Local environment files (preserve example template)
 .env*
 !.env.example
+
+# Local documentation (not for remote repo)
+dna.md
